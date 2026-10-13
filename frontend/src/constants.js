@@ -8,10 +8,14 @@ export const HOUR_MS = 3_600_000
 
 // --------------------------------------------------------------------- api
 
-// Empty by default: in dev, Vite proxies /api to Django on port 8010 (vite.config.js).
-// Set VITE_API_BASE_URL when the API lives on another origin.
+// Backend origin without a trailing slash, e.g. http://127.0.0.1:8010 (see README).
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 export const PLAN_TRIP_URL = `${API_BASE_URL}/api/trips/plan/`
+
+// ------------------------------------------------------------------- pages
+
+export const HOME_PATH = '/'
+export const PLAN_PATH = '/plan'
 
 // --------------------------------------------------------------- trip form
 

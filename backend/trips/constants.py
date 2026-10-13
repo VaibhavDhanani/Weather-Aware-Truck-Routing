@@ -22,6 +22,14 @@ LOCATION_MAX_LENGTH = 200
 CITY_NAME_PATTERN = r"^[^\W\d_](?:[^\W\d_]|[ .,'’-])*$"
 CITY_NAME_ERROR = 'Enter a city name, e.g. "Denver, CO" (letters, spaces and . , \' - only).'
 
+# ------------------------------------------------------------------------ http
+
+# Rate-limited (429) or briefly unavailable (503): wait and retry, honouring Retry-After
+# when it is short. Keeps a plan well inside gunicorn's 120 s worker timeout.
+HTTP_RETRY_STATUSES = (429, 503)
+HTTP_RETRY_DELAYS_SECONDS = (3, 10)
+HTTP_MAX_RETRY_AFTER_SECONDS = 15
+
 # ------------------------------------------------------------------ geocoding
 
 GEOCODE_CACHE_SECONDS = None  # never expires: a city's coordinates don't change
@@ -56,7 +64,7 @@ WEATHER_SERVICE = 'Weather service (Open-Meteo)'
 # tier counts each location as one call).
 WEATHER_GRID_DEG = 0.2
 WEATHER_BATCH_SIZE = 100
-WEATHER_MAX_PARALLEL = 4
+WEATHER_MAX_PARALLEL = 1  # sequential batches: bursts trip Open-Meteo's per-minute limit
 WEATHER_CACHE_SECONDS = 30 * 60
 WEATHER_CACHE_VERSION = 'wx2'  # bump when HOURLY_VARS changes so stale entries are ignored
 MAX_FORECAST_HOURS = 15 * 24
@@ -143,7 +151,7 @@ LOAD_RULES = (
 # ------------------------------------------------------------------- planning
 
 HEATMAP_HOURS = 48
-HEATMAP_CELLS = 16  # grid points along the corridor's longer side
+HEATMAP_CELLS = 12  # grid points along the corridor's longer side (each one is an Open-Meteo call)
 HEATMAP_PAD_DEG = 1.0
 DISPLAY_STEP_MILES = 0.5  # geometry resolution sent to the map
 SAME_PLACE_MILES = 1

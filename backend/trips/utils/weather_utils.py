@@ -1,5 +1,6 @@
 """Hourly forecasts from Open-Meteo (free, no key) and conversion to the app's weather shape."""
 
+import logging
 from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
 
@@ -30,6 +31,8 @@ from trips.constants import (
 )
 from trips.exceptions import ExternalServiceError
 from trips.utils.http_utils import HttpUtils
+
+logger = logging.getLogger(__name__)
 
 
 class Forecast:
@@ -80,6 +83,7 @@ class WeatherUtils:
         cached = cache.get_many(cache_key.values())
         series = {key: cached[ck] for key, ck in cache_key.items() if ck in cached}
         missing = [key for key in cache_key if key not in series]
+        logger.info('Redis weather cache: %d of %d grid cells cached, fetching %d', len(series), len(cache_key), len(missing))
 
         batches = [missing[i : i + WEATHER_BATCH_SIZE] for i in range(0, len(missing), WEATHER_BATCH_SIZE)]
         fetched = {}

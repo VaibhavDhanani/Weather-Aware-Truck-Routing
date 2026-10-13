@@ -1,6 +1,7 @@
 """City name -> coordinates via OpenStreetMap Nominatim (free, no key)."""
 
 import hashlib
+import logging
 import threading
 import time
 from dataclasses import asdict, dataclass
@@ -11,6 +12,8 @@ from django.core.cache import cache
 from trips.constants import GEOCODE_CACHE_SECONDS, GEOCODING_SERVICE, NOMINATIM_MIN_INTERVAL_SECONDS
 from trips.exceptions import LocationNotFound
 from trips.utils.http_utils import HttpUtils
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -35,7 +38,10 @@ class GeocodingUtils:
         key = 'geocode:' + hashlib.sha1(city.lower().encode()).hexdigest()
         cached = cache.get(key)
         if cached is not None:
+            logger.info('Redis geocode cache hit: %s', city)
             return Place(**cached)
+
+        logger.info('Redis geocode cache miss: %s', city)
 
         results = self._search_city(city)
         if not results:

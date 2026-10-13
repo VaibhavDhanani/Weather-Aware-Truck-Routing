@@ -7,14 +7,14 @@ recommends the best balance of risk and drive time.
 ```bash
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
-.venv/bin/python manage.py migrate
 .venv/bin/python manage.py runserver        # defaults to port 8010
-.venv/bin/python manage.py test             # offline; external APIs are faked
 ```
 
+There is no database: the API is stateless and only uses external services and
+Redis, so there are no migrations to run.
+
 Requires a running **Redis** (the cache; default `redis://127.0.0.1:6379/1`,
-override with `REDIS_URL`). On macOS: `brew services start redis`. Tests use an
-in-memory cache instead.
+override with `REDIS_URL`). On macOS: `brew services start redis`.
 
 No API keys are required. Every setting has a working default in
 `config/settings.py` and can be overridden with environment variables or a
@@ -37,8 +37,7 @@ No API keys are required. Every setting has a working default in
 - `departure`: ISO-8601, from 1 hour ago up to 7 days ahead
 - `loadWeightLbs`: 0–80,000 · `intervalMiles`: 10, 25 or 50
 
-Response shape: `frontend/src/api/tripsApi.js`; full example:
-`frontend/src/api/sample-plan-response.json`. Errors are `{"detail": "..."}` with
+Response shape: `frontend/src/api/tripsApi.js`. Errors are `{"detail": "..."}` with
 400 (bad input), 422 (place/route not found) or 502 (an upstream API failed).
 
 `GET /api/health/` → `{"status": "ok"}`
@@ -75,10 +74,10 @@ exceptions in `exception_status_codes` (e.g. `{LocationNotFound: 422}`).
 | Geocode origin/destination | `GeocodingUtils` | Nominatim, `featureType=city` (cached 7 days in Redis, ≤ 1 req/s) |
 | 3 route options | `RoutingUtils` | OSRM alternatives; if fewer than 3, adds detours via side waypoints (rejects ones > 60% slower or mostly overlapping). Truck speed capped at 65 mph. |
 | Checkpoints + ETAs | `PlanTripUtils` | every 10/25/50 mi, ETA from OSRM per-segment timings |
-| Hourly forecast | `WeatherUtils` | Open-Meteo, points snapped to a 0.2° grid, ≤ 100 per request, cached 30 min in Redis |
+| Hourly forecast | `WeatherUtils` | Open-Meteo, points snapped to a 0.2° grid, ≤ 100 per request (one at a time), cached 30 min in Redis |
 | Risk per checkpoint | `RiskUtils` | Level = worst of wind/rain/snow thresholds, raised by load rules; score = wind/55·0.30 + rain/1.0·0.30 + snow/3·0.40 |
 | Recommendation | `RiskUtils` / `PlanTripUtils` | fewest No Travel → Severe → High miles, then lowest average score, then shortest time |
-| 0–48 h heatmap | `PlanTripUtils` | ~16×16 grid over the corridor, weighted score per hour |
+| 0–48 h heatmap | `PlanTripUtils` | 12 points along the corridor's longer side, weighted score per hour |
 
 ## Caching (Redis)
 
@@ -87,6 +86,19 @@ exceptions in `exception_status_codes` (e.g. `{LocationNotFound: 422}`).
 | Whole plan response for an identical request (cities, departure, load, interval) | `plan:<hash>` | 60 s (`PLAN_CACHE_SECONDS`) |
 | City → coordinates | `geocode:<hash>` | never (`GEOCODE_CACHE_SECONDS = None`) |
 | Hourly forecast per 0.2° grid cell | `wx2:<hour>:…` | 30 min |
+
+Every Redis lookup is logged to stdout (Render → Logs), e.g.:
+
+```
+INFO config.wsgi: Redis connected (red-xxxx)              # once per worker at startup
+INFO trips.utils.plan_trip_utils: Redis plan cache miss: Denver, CO -> Chicago, IL
+INFO trips.utils.geocoding_utils: Redis geocode cache hit: Denver, CO
+INFO trips.utils.weather_utils: Redis weather cache: 184 of 194 grid cells cached, fetching 10
+INFO trips.utils.plan_trip_utils: Redis plan cache hit: Denver, CO -> Chicago, IL
+```
+
+A bad `REDIS_URL` logs `ERROR config.wsgi: Redis unavailable (...)` at startup, and requests then
+fail with 500 plus a full traceback in the logs.
 
 ## Risk rules
 
@@ -108,5 +120,10 @@ stretch between checkpoints at its worse end. Tables live in `trips/constants.py
 - **Nominatim**: max 1 request/second and no autocomplete use. Put a contact
   email in `HTTP_USER_AGENT` for anything beyond local development.
 - **Open-Meteo**: free for non-commercial use, ~10,000 location-calls/day. A
-  long trip uses a few hundred (cached for 30 minutes). Commercial use needs
-  their paid API key (`apikey` parameter + `customer-api.open-meteo.com`).
+  long trip uses a few hundred (cached for 30 minutes). Limits are per IP
+  (~600/min, ~5,000/hour, ~10,000/day), and free hosts such as Render share
+  outbound IPs, so a deploy can get HTTP 429 even when this app is idle.
+  `HttpUtils` retries 429/503 twice (3 s, then 10 s); the error shown after that
+  includes Open-Meteo's reason (minutely / hourly / daily limit). Commercial use,
+  or a dedicated quota, needs their paid API key (`apikey` parameter +
+  `customer-api.open-meteo.com`).

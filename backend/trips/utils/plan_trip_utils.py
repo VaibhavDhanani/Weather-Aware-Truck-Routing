@@ -1,5 +1,6 @@
 import hashlib
 import json
+import logging
 import math
 from datetime import datetime, timedelta, timezone
 
@@ -24,6 +25,8 @@ from trips.utils.risk_utils import RiskUtils
 from trips.utils.routing_utils import RoutingUtils
 from trips.utils.weather_utils import WeatherUtils
 
+logger = logging.getLogger(__name__)
+
 
 class PlanTripUtils:
     def __init__(self):
@@ -33,22 +36,25 @@ class PlanTripUtils:
         self.weather_utils = WeatherUtils()
         self.risk_utils = RiskUtils()
 
-    def plan_trip(self, *, origin, destination, departure, load_weight_lbs, interval_miles, now=None):
+    def plan_trip(self, *, origin, destination, departure, load_weight_lbs, interval_miles):
         """The full trip plan; identical requests within PLAN_CACHE_SECONDS reuse the cached response."""
         key = self._plan_cache_key(origin, destination, departure, load_weight_lbs, interval_miles)
         plan = cache.get(key)
-        if plan is None:
-            plan = self._build_plan(origin, destination, departure, load_weight_lbs, interval_miles, now)
-            cache.set(key, plan, PLAN_CACHE_SECONDS)
+        if plan is not None:
+            logger.info('Redis plan cache hit: %s -> %s', origin, destination)
+            return plan
+
+        logger.info('Redis plan cache miss: %s -> %s', origin, destination)
+        plan = self._build_plan(origin, destination, departure, load_weight_lbs, interval_miles)
+        cache.set(key, plan, PLAN_CACHE_SECONDS)
         return plan
 
     def _plan_cache_key(self, origin, destination, departure, load_weight_lbs, interval_miles):
         request = [origin.strip().lower(), destination.strip().lower(), self._iso(departure), load_weight_lbs, interval_miles]
         return 'plan:' + hashlib.sha1(json.dumps(request).encode()).hexdigest()
 
-    def _build_plan(self, origin, destination, departure, load_weight_lbs, interval_miles, now=None):
-        now = now or datetime.now(timezone.utc)
-        start = now.replace(minute=0, second=0, microsecond=0)
+    def _build_plan(self, origin, destination, departure, load_weight_lbs, interval_miles):
+        start = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0)
 
         o = self.geocoding_utils.geocode_city(origin)
         d = self.geocoding_utils.geocode_city(destination)
