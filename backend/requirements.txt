@@ -1,0 +1,6 @@
+Django==5.2.18
+django-cors-headers==4.9.0
+djangorestframework==3.18.3
+python-dotenv==1.2.4
+redis==8.1.0
+requests==2.34.2

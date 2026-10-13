@@ -1,0 +1,576 @@
+{
+  "origin": {
+    "name": "Dallas, TX",
+    "lon": -96.797,
+    "lat": 32.777
+  },
+  "destination": {
+    "name": "Oklahoma City, OK",
+    "lon": -97.516,
+    "lat": 35.468
+  },
+  "departure": "2026-10-12T19:02:01.386Z",
+  "loadWeightLbs": 42000,
+  "intervalMiles": 50,
+  "fastestRouteId": "A",
+  "safestRouteId": "C",
+  "recommendedRouteId": "C",
+  "recommendationReason": "Fewest Severe miles (100 vs 150 on Route A).",
+  "routes": [
+    {
+      "id": "A",
+      "name": "Direct interstate",
+      "geometry": [
+        [-96.797, 32.777],
+        [-96.9021, 33.0372],
+        [-96.9778, 33.3053],
+        [-96.989, 33.5906],
+        [-96.9901, 33.8786],
+        [-97.0623, 34.1477],
+        [-97.2114, 34.3961],
+        [-97.3586, 34.6451],
+        [-97.4353, 34.9129],
+        [-97.4631, 35.1938],
+        [-97.516, 35.468]
+      ],
+      "distanceMiles": 193,
+      "durationMinutes": 200,
+      "departure": "2026-10-12T19:02:01.386Z",
+      "arrival": "2026-10-12T22:21:33.410Z",
+      "riskLevel": "severe",
+      "riskScore": 17,
+      "milesByLevel": {
+        "low": 43,
+        "moderate": 0,
+        "high": 0,
+        "severe": 150,
+        "no_travel": 0
+      },
+      "checkpoints": [
+        {
+          "index": 0,
+          "mile": 0,
+          "lon": -96.797,
+          "lat": 32.777,
+          "eta": "2026-10-12T19:02:01.386Z",
+          "inForecastWindow": true,
+          "weather": {
+            "tempF": 77,
+            "windMph": 17,
+            "gustMph": 17,
+            "precipInHr": 0.1,
+            "rainInHr": 0.1,
+            "snowInHr": 0,
+            "precipType": "rain",
+            "visibilityMi": 8.4,
+            "condition": "Rain"
+          },
+          "risk": {
+            "level": "moderate",
+            "score": 12,
+            "factors": [
+              "Rain 0.1 in/hr → Moderate"
+            ]
+          }
+        },
+        {
+          "index": 1,
+          "mile": 50,
+          "lon": -96.9906,
+          "lat": 33.4778,
+          "eta": "2026-10-12T19:53:44.834Z",
+          "inForecastWindow": true,
+          "weather": {
+            "tempF": 76,
+            "windMph": 35,
+            "gustMph": 35,
+            "precipInHr": 0.21,
+            "rainInHr": 0.21,
+            "snowInHr": 0,
+            "precipType": "rain",
+            "visibilityMi": 6.6,
+            "condition": "Rain"
+          },
+          "risk": {
+            "level": "severe",
+            "score": 25,
+            "factors": [
+              "Wind 35 mph → High",
+              "Rain 0.21 in/hr → Moderate",
+              "Wind 35 mph with a load over 40,000 lb → Severe"
+            ]
+          }
+        },
+        {
+          "index": 2,
+          "mile": 100,
+          "lon": -97.0833,
+          "lat": 34.1903,
+          "eta": "2026-10-12T20:45:28.282Z",
+          "inForecastWindow": true,
+          "weather": {
+            "tempF": 76,
+            "windMph": 41,
+            "gustMph": 41,
+            "precipInHr": 0.16,
+            "rainInHr": 0.16,
+            "snowInHr": 0,
+            "precipType": "rain",
+            "visibilityMi": 7.4,
+            "condition": "Rain"
+          },
+          "risk": {
+            "level": "severe",
+            "score": 27,
+            "factors": [
+              "Wind 41 mph → High",
+              "Rain 0.16 in/hr → Moderate",
+              "Wind 41 mph with a load over 40,000 lb → Severe"
+            ]
+          }
+        },
+        {
+          "index": 3,
+          "mile": 150,
+          "lon": -97.4249,
+          "lat": 34.8526,
+          "eta": "2026-10-12T21:37:11.730Z",
+          "inForecastWindow": true,
+          "weather": {
+            "tempF": 75,
+            "windMph": 24,
+            "gustMph": 24,
+            "precipInHr": 0.07,
+            "rainInHr": 0.07,
+            "snowInHr": 0,
+            "precipType": "rain",
+            "visibilityMi": 8.9,
+            "condition": "Rain"
+          },
+          "risk": {
+            "level": "low",
+            "score": 15,
+            "factors": []
+          }
+        },
+        {
+          "index": 4,
+          "mile": 193,
+          "lon": -97.516,
+          "lat": 35.468,
+          "eta": "2026-10-12T22:21:33.410Z",
+          "inForecastWindow": true,
+          "weather": {
+            "tempF": 74,
+            "windMph": 11,
+            "gustMph": 11,
+            "precipInHr": 0.01,
+            "rainInHr": 0,
+            "snowInHr": 0,
+            "precipType": "none",
+            "visibilityMi": 9.8,
+            "condition": "Cloudy"
+          },
+          "risk": {
+            "level": "low",
+            "score": 6,
+            "factors": []
+          }
+        }
+      ],
+      "summary": "Fastest option. Worst: Severe near mile 50 (~Tue 1:23 AM) — Wind 35 mph → High; Rain 0.21 in/hr → Moderate; Wind 35 mph with a load over 40,000 lb → Severe. 150 mi Severe."
+    },
+    {
+      "id": "B",
+      "name": "Southern corridor",
+      "geometry": [
+        [-96.797, 32.777],
+        [-96.977, 33.0172],
+        [-97.1202, 33.2673],
+        [-97.185, 33.5383],
+        [-97.2205, 33.8171],
+        [-97.3045, 34.083],
+        [-97.4418, 34.3346],
+        [-97.5545, 34.5928],
+        [-97.5777, 34.8749],
+        [-97.5379, 35.1738],
+        [-97.516, 35.468]
+      ],
+      "distanceMiles": 195,
+      "durationMinutes": 213,
+      "departure": "2026-10-12T19:02:01.386Z",
+      "arrival": "2026-10-12T22:34:57.537Z",
+      "riskLevel": "severe",
+      "riskScore": 18,
+      "milesByLevel": {
+        "low": 45,
+        "moderate": 0,
+        "high": 0,
+        "severe": 150,
+        "no_travel": 0
+      },
+      "checkpoints": [
+        {
+          "index": 0,
+          "mile": 0,
+          "lon": -96.797,
+          "lat": 32.777,
+          "eta": "2026-10-12T19:02:01.386Z",
+          "inForecastWindow": true,
+          "weather": {
+            "tempF": 77,
+            "windMph": 17,
+            "gustMph": 17,
+            "precipInHr": 0.1,
+            "rainInHr": 0.1,
+            "snowInHr": 0,
+            "precipType": "rain",
+            "visibilityMi": 8.4,
+            "condition": "Rain"
+          },
+          "risk": {
+            "level": "moderate",
+            "score": 12,
+            "factors": [
+              "Rain 0.1 in/hr → Moderate"
+            ]
+          }
+        },
+        {
+          "index": 1,
+          "mile": 50,
+          "lon": -97.1664,
+          "lat": 33.4243,
+          "eta": "2026-10-12T19:56:34.113Z",
+          "inForecastWindow": true,
+          "weather": {
+            "tempF": 76,
+            "windMph": 35,
+            "gustMph": 35,
+            "precipInHr": 0.27,
+            "rainInHr": 0.27,
+            "snowInHr": 0,
+            "precipType": "rain",
+            "visibilityMi": 5.7,
+            "condition": "Thunderstorm"
+          },
+          "risk": {
+            "level": "severe",
+            "score": 27,
+            "factors": [
+              "Wind 35 mph → High",
+              "Rain 0.27 in/hr → High",
+              "Wind 35 mph with a load over 40,000 lb → Severe"
+            ]
+          }
+        },
+        {
+          "index": 2,
+          "mile": 100,
+          "lon": -97.3283,
+          "lat": 34.1319,
+          "eta": "2026-10-12T20:51:06.840Z",
+          "inForecastWindow": true,
+          "weather": {
+            "tempF": 76,
+            "windMph": 41,
+            "gustMph": 41,
+            "precipInHr": 0.22,
+            "rainInHr": 0.22,
+            "snowInHr": 0,
+            "precipType": "rain",
+            "visibilityMi": 6.5,
+            "condition": "Rain"
+          },
+          "risk": {
+            "level": "severe",
+            "score": 29,
+            "factors": [
+              "Wind 41 mph → High",
+              "Rain 0.22 in/hr → Moderate",
+              "Wind 41 mph with a load over 40,000 lb → Severe"
+            ]
+          }
+        },
+        {
+          "index": 3,
+          "mile": 150,
+          "lon": -97.5803,
+          "lat": 34.8166,
+          "eta": "2026-10-12T21:45:39.567Z",
+          "inForecastWindow": true,
+          "weather": {
+            "tempF": 75,
+            "windMph": 23,
+            "gustMph": 23,
+            "precipInHr": 0.08,
+            "rainInHr": 0.08,
+            "snowInHr": 0,
+            "precipType": "rain",
+            "visibilityMi": 8.7,
+            "condition": "Rain"
+          },
+          "risk": {
+            "level": "low",
+            "score": 15,
+            "factors": []
+          }
+        },
+        {
+          "index": 4,
+          "mile": 195,
+          "lon": -97.516,
+          "lat": 35.468,
+          "eta": "2026-10-12T22:34:57.537Z",
+          "inForecastWindow": true,
+          "weather": {
+            "tempF": 74,
+            "windMph": 10,
+            "gustMph": 10,
+            "precipInHr": 0.01,
+            "rainInHr": 0,
+            "snowInHr": 0,
+            "precipType": "none",
+            "visibilityMi": 9.8,
+            "condition": "Cloudy"
+          },
+          "risk": {
+            "level": "low",
+            "score": 5,
+            "factors": []
+          }
+        }
+      ],
+      "summary": "Worst: Severe near mile 50 (~Tue 1:26 AM) — Wind 35 mph → High; Rain 0.27 in/hr → High; Wind 35 mph with a load over 40,000 lb → Severe. 150 mi Severe."
+    },
+    {
+      "id": "C",
+      "name": "Northern corridor",
+      "geometry": [
+        [-96.797, 32.777],
+        [-96.8314, 33.0561],
+        [-96.8466, 33.3404],
+        [-96.8178, 33.6364],
+        [-96.7972, 33.9302],
+        [-96.8588, 34.2021],
+        [-97.0088, 34.4503],
+        [-97.1772, 34.6936],
+        [-97.3009, 34.9488],
+        [-97.3942, 35.2122],
+        [-97.516, 35.468]
+      ],
+      "distanceMiles": 195,
+      "durationMinutes": 220,
+      "departure": "2026-10-12T19:02:01.386Z",
+      "arrival": "2026-10-12T22:42:20.787Z",
+      "riskLevel": "severe",
+      "riskScore": 16,
+      "milesByLevel": {
+        "low": 45,
+        "moderate": 50,
+        "high": 0,
+        "severe": 100,
+        "no_travel": 0
+      },
+      "checkpoints": [
+        {
+          "index": 0,
+          "mile": 0,
+          "lon": -96.797,
+          "lat": 32.777,
+          "eta": "2026-10-12T19:02:01.386Z",
+          "inForecastWindow": true,
+          "weather": {
+            "tempF": 77,
+            "windMph": 17,
+            "gustMph": 17,
+            "precipInHr": 0.1,
+            "rainInHr": 0.1,
+            "snowInHr": 0,
+            "precipType": "rain",
+            "visibilityMi": 8.4,
+            "condition": "Rain"
+          },
+          "risk": {
+            "level": "moderate",
+            "score": 12,
+            "factors": [
+              "Rain 0.1 in/hr → Moderate"
+            ]
+          }
+        },
+        {
+          "index": 1,
+          "mile": 50,
+          "lon": -96.8349,
+          "lat": 33.4983,
+          "eta": "2026-10-12T19:58:37.612Z",
+          "inForecastWindow": true,
+          "weather": {
+            "tempF": 76,
+            "windMph": 34,
+            "gustMph": 34,
+            "precipInHr": 0.17,
+            "rainInHr": 0.17,
+            "snowInHr": 0,
+            "precipType": "rain",
+            "visibilityMi": 7.3,
+            "condition": "Rain"
+          },
+          "risk": {
+            "level": "moderate",
+            "score": 24,
+            "factors": [
+              "Wind 34 mph → Moderate",
+              "Rain 0.17 in/hr → Moderate"
+            ]
+          }
+        },
+        {
+          "index": 2,
+          "mile": 100,
+          "lon": -96.864,
+          "lat": 34.2138,
+          "eta": "2026-10-12T20:55:13.838Z",
+          "inForecastWindow": true,
+          "weather": {
+            "tempF": 75,
+            "windMph": 39,
+            "gustMph": 39,
+            "precipInHr": 0.13,
+            "rainInHr": 0.13,
+            "snowInHr": 0,
+            "precipType": "rain",
+            "visibilityMi": 7.9,
+            "condition": "Rain"
+          },
+          "risk": {
+            "level": "severe",
+            "score": 25,
+            "factors": [
+              "Wind 39 mph → High",
+              "Rain 0.13 in/hr → Moderate",
+              "Wind 39 mph with a load over 40,000 lb → Severe"
+            ]
+          }
+        },
+        {
+          "index": 3,
+          "mile": 150,
+          "lon": -97.2631,
+          "lat": 34.8571,
+          "eta": "2026-10-12T21:51:50.065Z",
+          "inForecastWindow": true,
+          "weather": {
+            "tempF": 75,
+            "windMph": 23,
+            "gustMph": 23,
+            "precipInHr": 0.07,
+            "rainInHr": 0.07,
+            "snowInHr": 0,
+            "precipType": "rain",
+            "visibilityMi": 8.9,
+            "condition": "Rain"
+          },
+          "risk": {
+            "level": "low",
+            "score": 15,
+            "factors": []
+          }
+        },
+        {
+          "index": 4,
+          "mile": 195,
+          "lon": -97.516,
+          "lat": 35.468,
+          "eta": "2026-10-12T22:42:20.787Z",
+          "inForecastWindow": true,
+          "weather": {
+            "tempF": 74,
+            "windMph": 10,
+            "gustMph": 10,
+            "precipInHr": 0.01,
+            "rainInHr": 0,
+            "snowInHr": 0,
+            "precipType": "none",
+            "visibilityMi": 9.8,
+            "condition": "Cloudy"
+          },
+          "risk": {
+            "level": "low",
+            "score": 5,
+            "factors": []
+          }
+        }
+      ],
+      "summary": "Lowest weather risk. Worst: Severe near mile 100 (~Tue 2:25 AM) — Wind 39 mph → High; Rain 0.13 in/hr → Moderate; Wind 39 mph with a load over 40,000 lb → Severe. 100 mi Severe."
+    }
+  ],
+  "heatmap": {
+    "forecastStart": "2026-10-12T18:00:00.000Z",
+    "hours": 48,
+    "cellSizeDeg": 1.2614,
+    "points": [
+      {
+        "lon": -99.0805,
+        "lat": 31.277,
+        "values": [0.05, 0.05, 0.04, 0.04, 0.05, 0.05, 0.06, 0.07, 0.07, 0.07, 0.07, 0.07, 0.07, 0.06, 0.06, 0.05, 0.05, 0.04, 0.04, 0.04, 0.05, 0.05, 0.06, 0.07, 0.07, 0.07, 0.06, 0.05, 0.05, 0.04, 0.04, 0.03, 0.03, 0.03, 0.04, 0.04, 0.05, 0.05, 0.06, 0.07, 0.07, 0.07, 0.06, 0.05, 0.05, 0.04, 0.04, 0.03, 0.03]
+      },
+      {
+        "lon": -97.8191,
+        "lat": 31.277,
+        "values": [0.08, 0.08, 0.07, 0.07, 0.06, 0.04, 0.04, 0.03, 0.03, 0.03, 0.04, 0.04, 0.05, 0.06, 0.07, 0.08, 0.08, 0.08, 0.07, 0.07, 0.05, 0.04, 0.04, 0.03, 0.03, 0.03, 0.04, 0.04, 0.05, 0.06, 0.06, 0.07, 0.07, 0.07, 0.06, 0.05, 0.04, 0.04, 0.03, 0.03, 0.03, 0.04, 0.04, 0.05, 0.05, 0.06, 0.07, 0.07, 0.07]
+      },
+      {
+        "lon": -96.5578,
+        "lat": 31.277,
+        "values": [0.03, 0.03, 0.04, 0.04, 0.05, 0.06, 0.07, 0.07, 0.07, 0.07, 0.06, 0.05, 0.05, 0.04, 0.04, 0.03, 0.03, 0.04, 0.04, 0.05, 0.05, 0.06, 0.07, 0.07, 0.07, 0.07, 0.06, 0.05, 0.04, 0.04, 0.03, 0.03, 0.03, 0.04, 0.04, 0.05, 0.05, 0.06, 0.07, 0.07, 0.07, 0.06, 0.05, 0.05, 0.04, 0.04, 0.03, 0.03, 0.03]
+      },
+      {
+        "lon": -95.2964,
+        "lat": 31.277,
+        "values": [0.07, 0.06, 0.06, 0.05, 0.04, 0.04, 0.04, 0.03, 0.03, 0.04, 0.04, 0.05, 0.05, 0.06, 0.07, 0.07, 0.07, 0.06, 0.05, 0.05, 0.04, 0.04, 0.03, 0.03, 0.03, 0.04, 0.04, 0.05, 0.05, 0.06, 0.07, 0.07, 0.07, 0.06, 0.05, 0.05, 0.04, 0.04, 0.03, 0.03, 0.03, 0.04, 0.04, 0.05, 0.06, 0.06, 0.07, 0.07, 0.07]
+      },
+      {
+        "lon": -99.0805,
+        "lat": 34.1248,
+        "values": [0.17, 0.15, 0.13, 0.11, 0.08, 0.06, 0.05, 0.04, 0.04, 0.04, 0.06, 0.09, 0.12, 0.16, 0.19, 0.18, 0.16, 0.12, 0.1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.09, 0.09, 0.09, 0.08, 0.08, 0.08, 0.07, 0.06, 0.05, 0.05, 0.04, 0.04, 0.03, 0.03, 0.03, 0.04, 0.04, 0.05, 0.06, 0.06, 0.07, 0.07, 0.06, 0.06]
+      },
+      {
+        "lon": -97.8191,
+        "lat": 34.1248,
+        "values": [0.2, 0.23, 0.25, 0.26, 0.25, 0.24, 0.2, 0.17, 0.13, 0.1, 0.08, 0.06, 0.05, 0.05, 0.08, 0.11, 0.15, 0.17, 0.17, 0.16, 0.15, 0.14, 0.14, 0.14, 0.13, 0.13, 0.13, 0.12, 0.11, 0.1, 0.1, 0.09, 0.08, 0.08, 0.07, 0.07, 0.07, 0.07, 0.07, 0.06, 0.05, 0.05, 0.04, 0.04, 0.03, 0.03, 0.03, 0.04, 0.04]
+      },
+      {
+        "lon": -96.5578,
+        "lat": 34.1248,
+        "values": [0.11, 0.15, 0.19, 0.22, 0.26, 0.27, 0.3, 0.32, 0.31, 0.28, 0.24, 0.2, 0.16, 0.12, 0.1, 0.09, 0.08, 0.1, 0.11, 0.13, 0.14, 0.14, 0.14, 0.15, 0.15, 0.16, 0.17, 0.17, 0.17, 0.17, 0.16, 0.16, 0.15, 0.14, 0.13, 0.1, 0.09, 0.07, 0.06, 0.05, 0.05, 0.05, 0.06, 0.06, 0.07, 0.07, 0.07, 0.06, 0.05]
+      },
+      {
+        "lon": -95.2964,
+        "lat": 34.1248,
+        "values": [0.04, 0.05, 0.07, 0.09, 0.11, 0.16, 0.2, 0.25, 0.29, 0.31, 0.34, 0.35, 0.34, 0.29, 0.24, 0.19, 0.14, 0.11, 0.09, 0.09, 0.1, 0.11, 0.13, 0.14, 0.13, 0.14, 0.15, 0.15, 0.17, 0.16, 0.16, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.14, 0.13, 0.1, 0.08, 0.07, 0.05, 0.04, 0.04, 0.04, 0.04, 0.05]
+      },
+      {
+        "lon": -99.0805,
+        "lat": 36.9726,
+        "values": [0.05, 0.05, 0.06, 0.07, 0.07, 0.07, 0.06, 0.05, 0.05, 0.04, 0.04, 0.03, 0.03, 0.03, 0.04, 0.04, 0.05, 0.06, 0.07, 0.07, 0.08, 0.07, 0.07, 0.06, 0.05, 0.04, 0.04, 0.03, 0.03, 0.04, 0.04, 0.04, 0.05, 0.06, 0.06, 0.07, 0.07, 0.06, 0.06, 0.05, 0.04, 0.04, 0.03, 0.03, 0.03, 0.04, 0.04, 0.05, 0.05]
+      },
+      {
+        "lon": -97.8191,
+        "lat": 36.9726,
+        "values": [0.05, 0.04, 0.04, 0.03, 0.03, 0.03, 0.04, 0.04, 0.05, 0.05, 0.06, 0.07, 0.07, 0.07, 0.06, 0.05, 0.05, 0.04, 0.04, 0.03, 0.04, 0.04, 0.04, 0.05, 0.05, 0.07, 0.07, 0.07, 0.07, 0.07, 0.06, 0.05, 0.04, 0.04, 0.03, 0.03, 0.03, 0.04, 0.04, 0.05, 0.05, 0.06, 0.07, 0.07, 0.07, 0.06, 0.05, 0.05, 0.04]
+      },
+      {
+        "lon": -96.5578,
+        "lat": 36.9726,
+        "values": [0.05, 0.06, 0.07, 0.07, 0.07, 0.06, 0.06, 0.05, 0.04, 0.04, 0.03, 0.03, 0.03, 0.04, 0.04, 0.05, 0.05, 0.06, 0.07, 0.07, 0.07, 0.07, 0.06, 0.05, 0.04, 0.04, 0.03, 0.03, 0.04, 0.04, 0.04, 0.05, 0.05, 0.06, 0.07, 0.07, 0.07, 0.06, 0.05, 0.05, 0.04, 0.04, 0.03, 0.03, 0.03, 0.04, 0.04, 0.05, 0.06]
+      },
+      {
+        "lon": -95.2964,
+        "lat": 36.9726,
+        "values": [0.04, 0.04, 0.03, 0.03, 0.03, 0.04, 0.04, 0.05, 0.05, 0.06, 0.07, 0.07, 0.07, 0.06, 0.05, 0.05, 0.04, 0.04, 0.03, 0.03, 0.04, 0.04, 0.05, 0.05, 0.06, 0.07, 0.07, 0.07, 0.07, 0.06, 0.05, 0.05, 0.04, 0.04, 0.03, 0.03, 0.04, 0.04, 0.05, 0.05, 0.06, 0.07, 0.07, 0.07, 0.06, 0.05, 0.05, 0.04, 0.04]
+      }
+    ]
+  }
+}
