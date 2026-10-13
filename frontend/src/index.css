@@ -1,45 +1,40 @@
-:root {
-  --bg: #f6f7f9;
-  --surface: #ffffff;
-  --text: #1f2933;
-  --muted: #64707d;
-  --border: #e1e5ea;
-  --accent: #2563eb;
-  --accent-soft: #e8efff;
-  --danger: #c92a2a;
-  --radius: 10px;
-  --shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
+@import 'tailwindcss';
 
-  font: 14px/1.45 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  color: var(--text);
-  background: var(--bg);
-  color-scheme: light;
-  -webkit-font-smoothing: antialiased;
+@theme {
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --color-page: #f6f7f9;
+  --color-surface: #ffffff;
+  --color-ink: #1f2933;
+  --color-muted: #64707d;
+  --color-line: #e1e5ea;
+  --color-subtle: #eef1f4;
+  --color-accent: #2563eb;
+  --color-accent-soft: #e8efff;
+  --color-danger: #c92a2a;
+  --color-danger-soft: #fdecec;
+  --color-good: #23784a;
+  --color-good-soft: #eaf7ef;
+  --color-star: #e8a400;
+
+  --shadow-float: 0 4px 16px rgba(15, 23, 42, 0.12);
+
+  /* Below this width the map goes on top and the panel below it. */
+  --breakpoint-desk: 860px;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
 
-html,
-body,
-#root {
-  height: 100%;
-  margin: 0;
-}
-
-button,
-input,
-select {
-  font: inherit;
-  color: inherit;
-}
-
-h1,
-h2,
-h3,
-p {
-  margin: 0;
+  body {
+    font-size: 14px;
+    line-height: 1.45;
+    color-scheme: light;
+    -webkit-font-smoothing: antialiased;
+    @apply bg-page text-ink;
+  }
 }

@@ -1,14 +1,12 @@
 import { useCallback, useState } from 'react'
-import { isDemoMode, planTrip } from './api/client'
+import { planTrip } from './api/tripsApi'
 import CheckpointTable from './components/CheckpointTable'
 import ForecastSlider from './components/ForecastSlider'
 import Legend from './components/Legend'
 import RouteList from './components/RouteList'
 import RouteMap from './components/RouteMap'
 import TripForm from './components/TripForm'
-import './App.css'
-
-const HOUR_MS = 3_600_000
+import { FORECAST_HOURS, HOUR_MS } from './constants'
 
 export default function App() {
   const [plan, setPlan] = useState(null)
@@ -19,7 +17,7 @@ export default function App() {
   const [hour, setHour] = useState(0)
   const [showHeatmap, setShowHeatmap] = useState(true)
 
-  const maxHour = plan?.heatmap.hours ?? 48
+  const maxHour = plan?.heatmap.hours ?? FORECAST_HOURS
   const forecastTime = plan && new Date(Date.parse(plan.heatmap.forecastStart) + hour * HOUR_MS)
   const selectedRoute = plan?.routes.find((r) => r.id === selectedRouteId)
 
@@ -32,8 +30,8 @@ export default function App() {
       setSelectedRouteId(result.recommendedRouteId)
       setActiveCheckpoint(null)
       // Start the slider at departure so the truck marker is on the map.
-      const departHour = Math.round((Date.parse(result.departure) - Date.parse(result.heatmap.forecastStart)) / HOUR_MS)
-      setHour(Math.min(result.heatmap.hours, Math.max(0, departHour)))
+      const departureHour = Math.round((Date.parse(result.departure) - Date.parse(result.heatmap.forecastStart)) / HOUR_MS)
+      setHour(Math.min(result.heatmap.hours, Math.max(0, departureHour)))
     } catch (err) {
       setError(err.message)
     } finally {
@@ -47,16 +45,13 @@ export default function App() {
   }, [])
 
   return (
-    <div className="app">
-      <aside className="sidebar">
-        <header className="brand">
-          <h1>Weather-Aware Truck Routing</h1>
-          {isDemoMode && <span className="demo-badge" title="Using simulated routes and weather">Demo data</span>}
-        </header>
+    <div className="grid grid-cols-1 desk:h-full desk:grid-cols-[400px_1fr]">
+      <aside className="flex flex-col gap-4 bg-surface p-[18px] desk:overflow-y-auto desk:border-r desk:border-line">
+        <h1 className="text-lg font-bold">Weather-Aware Truck Routing</h1>
 
         <TripForm onSubmit={handlePlan} loading={loading} />
 
-        {error && <div className="error">{error}</div>}
+        {error && <div className="rounded-lg bg-danger-soft px-3 py-2.5 text-danger">{error}</div>}
 
         {plan ? (
           <>
@@ -67,14 +62,14 @@ export default function App() {
           </>
         ) : (
           !error && (
-            <p className="empty-hint">
+            <p className="text-muted">
               Enter a trip and press <strong>Plan routes</strong> to compare three routes by weather risk and drive time.
             </p>
           )
         )}
       </aside>
 
-      <main className="map-area">
+      <main className="relative -order-1 h-[60vh] min-h-0 desk:order-none desk:h-auto">
         <RouteMap
           plan={plan}
           selectedRouteId={selectedRouteId}

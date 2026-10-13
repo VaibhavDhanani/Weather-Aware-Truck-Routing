@@ -1,6 +1,3 @@
-"""Builds the trip-plan response the frontend renders (shape documented in
-frontend/src/api/client.js; example in frontend/src/api/sample-plan-response.json)."""
-
 import hashlib
 import json
 import math

@@ -1,5 +1,10 @@
 .venv/
 __pycache__/
 *.pyc
-.env
 db.sqlite3
+
+# Environment files (keep the committed example)
+.env
+.env.*
+*.env
+!.env.example

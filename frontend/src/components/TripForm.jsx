@@ -1,47 +1,32 @@
 import { useState } from 'react'
-import { toLocalInputValue } from '../lib/format'
-import { CITY_NAME_ERROR, CITY_NAME_MAX_LENGTH, isCityName } from '../lib/validation'
-import { CITIES } from '../lib/cities'
+import {
+  CITY_NAME_ERROR,
+  CITY_NAME_MAX_LENGTH,
+  CITY_SUGGESTIONS,
+  DEFAULT_TRIP,
+  INTERVAL_MILES_CHOICES,
+  LOAD_STEP_LBS,
+  MAX_GROSS_WEIGHT_LBS,
+} from '../constants'
+import { nextFullHour, toLocalInputValue } from '../utils/formatUtils'
+import { isCityName } from '../utils/validationUtils'
 
-const INTERVALS = [10, 25, 50]
-
-function CityInput({ label, value, onChange }) {
-  const invalid = value.trim() !== '' && !isCityName(value)
-  return (
-    <label>
-      {label}
-      <input
-        value={value}
-        onChange={(e) => {
-          const next = e.target.value
-          // Native validity blocks form submission while the value isn't a city name.
-          e.target.setCustomValidity(next.trim() === '' || isCityName(next) ? '' : CITY_NAME_ERROR)
-          onChange(next)
-        }}
-        list="city-suggestions"
-        placeholder="City, e.g. Denver, CO"
-        maxLength={CITY_NAME_MAX_LENGTH}
-        aria-invalid={invalid}
-        required
-      />
-      {invalid && <span className="field-error">{CITY_NAME_ERROR}</span>}
-    </label>
-  )
-}
-
-function nextHour() {
-  const d = new Date()
-  d.setMinutes(0, 0, 0)
-  d.setHours(d.getHours() + 1)
-  return d
-}
+const LABEL = 'flex flex-col gap-1 text-xs font-semibold text-muted'
+const INPUT =
+  'min-w-0 rounded-lg border border-line bg-surface px-2.5 py-2 text-sm font-normal text-ink ' +
+  'focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-accent aria-invalid:border-danger'
+const SEGMENT =
+  'flex-1 cursor-pointer border border-line py-[7px] text-center text-[13px] ' +
+  'not-first-of-type:border-l-0 first-of-type:rounded-l-lg last-of-type:rounded-r-lg ' +
+  'has-checked:border-accent has-checked:bg-accent-soft has-checked:text-accent ' +
+  'has-focus-visible:outline-2 has-focus-visible:outline-accent'
 
 export default function TripForm({ onSubmit, loading }) {
-  const [origin, setOrigin] = useState('Denver, CO')
-  const [destination, setDestination] = useState('Chicago, IL')
-  const [departure, setDeparture] = useState(() => toLocalInputValue(nextHour()))
-  const [loadWeightLbs, setLoadWeightLbs] = useState(42000)
-  const [intervalMiles, setIntervalMiles] = useState(25)
+  const [origin, setOrigin] = useState(DEFAULT_TRIP.origin)
+  const [destination, setDestination] = useState(DEFAULT_TRIP.destination)
+  const [departure, setDeparture] = useState(() => toLocalInputValue(nextFullHour()))
+  const [loadWeightLbs, setLoadWeightLbs] = useState(DEFAULT_TRIP.loadWeightLbs)
+  const [intervalMiles, setIntervalMiles] = useState(DEFAULT_TRIP.intervalMiles)
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -56,28 +41,34 @@ export default function TripForm({ onSubmit, loading }) {
   }
 
   return (
-    <form className="trip-form" onSubmit={handleSubmit}>
+    <form className="flex flex-col gap-2.5" onSubmit={handleSubmit}>
       <CityInput label="Origin" value={origin} onChange={setOrigin} />
       <CityInput label="Destination" value={destination} onChange={setDestination} />
-      {/* Suggestions only; any city name can be typed. */}
       <datalist id="city-suggestions">
-        {CITIES.map((c) => (
-          <option key={c.name} value={c.name} />
+        {CITY_SUGGESTIONS.map((city) => (
+          <option key={city} value={city} />
         ))}
       </datalist>
 
-      <div className="trip-form-row">
-        <label>
+      <div className="grid grid-cols-[1.4fr_1fr] gap-2.5">
+        <label className={LABEL}>
           Departure
-          <input type="datetime-local" value={departure} onChange={(e) => setDeparture(e.target.value)} required />
+          <input
+            className={INPUT}
+            type="datetime-local"
+            value={departure}
+            onChange={(e) => setDeparture(e.target.value)}
+            required
+          />
         </label>
-        <label>
+        <label className={LABEL}>
           Load (lbs)
           <input
+            className={INPUT}
             type="number"
             min={0}
-            max={80000}
-            step={500}
+            max={MAX_GROSS_WEIGHT_LBS}
+            step={LOAD_STEP_LBS}
             value={loadWeightLbs}
             onChange={(e) => setLoadWeightLbs(e.target.value)}
             required
@@ -85,25 +76,57 @@ export default function TripForm({ onSubmit, loading }) {
         </label>
       </div>
 
-      <fieldset className="segmented">
-        <legend>Weather checkpoint every</legend>
-        {INTERVALS.map((mi) => (
-          <label key={mi} className={intervalMiles === mi ? 'is-active' : ''}>
+      <fieldset className="flex">
+        <legend className="mb-1 text-xs font-semibold text-muted">Weather checkpoint every</legend>
+        {INTERVAL_MILES_CHOICES.map((miles) => (
+          <label key={miles} className={SEGMENT}>
             <input
+              className="sr-only"
               type="radio"
               name="interval"
-              value={mi}
-              checked={intervalMiles === mi}
-              onChange={() => setIntervalMiles(mi)}
+              checked={intervalMiles === miles}
+              onChange={() => setIntervalMiles(miles)}
             />
-            {mi} mi
+            {miles} mi
           </label>
         ))}
       </fieldset>
 
-      <button type="submit" className="primary" disabled={loading}>
+      <button
+        type="submit"
+        className="cursor-pointer rounded-lg bg-accent p-2.5 font-semibold text-white disabled:cursor-progress disabled:opacity-60"
+        disabled={loading}
+      >
         {loading ? 'Planning…' : 'Plan routes'}
       </button>
     </form>
+  )
+}
+
+function CityInput({ label, value, onChange }) {
+  const invalid = value.trim() !== '' && !isCityName(value)
+
+  function handleChange(e) {
+    const next = e.target.value
+    // Native validity blocks form submission while the value isn't a city name.
+    e.target.setCustomValidity(next.trim() === '' || isCityName(next) ? '' : CITY_NAME_ERROR)
+    onChange(next)
+  }
+
+  return (
+    <label className={LABEL}>
+      {label}
+      <input
+        className={INPUT}
+        value={value}
+        onChange={handleChange}
+        list="city-suggestions"
+        placeholder="City, e.g. Denver, CO"
+        maxLength={CITY_NAME_MAX_LENGTH}
+        aria-invalid={invalid}
+        required
+      />
+      {invalid && <span className="font-normal text-danger">{CITY_NAME_ERROR}</span>}
+    </label>
   )
 }

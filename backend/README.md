@@ -37,7 +37,7 @@ No API keys are required. Every setting has a working default in
 - `departure`: ISO-8601, from 1 hour ago up to 7 days ahead
 - `loadWeightLbs`: 0–80,000 · `intervalMiles`: 10, 25 or 50
 
-Response shape: `frontend/src/api/client.js`; full example:
+Response shape: `frontend/src/api/tripsApi.js`; full example:
 `frontend/src/api/sample-plan-response.json`. Errors are `{"detail": "..."}` with
 400 (bad input), 422 (place/route not found) or 502 (an upstream API failed).
 

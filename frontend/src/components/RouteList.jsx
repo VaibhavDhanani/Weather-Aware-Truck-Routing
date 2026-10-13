@@ -1,78 +1,106 @@
-import { formatDuration, formatMiles, formatTime } from '../lib/format'
-import { RISK_COLOR, RISK_LEVELS, riskLabel } from '../lib/risk'
-import { routeColor } from '../lib/routeColors'
+import { RECOMMENDATION_LEVELS, RISK_LEVELS } from '../constants'
+import { formatDuration, formatMiles, formatTime } from '../utils/formatUtils'
+import { riskColor, riskLabel } from '../utils/riskUtils'
+import { routeColor } from '../utils/routeUtils'
+
+const TAG = 'rounded-full px-[7px] py-px text-[11px] font-semibold'
+const STAT_LABEL = 'block text-[11px] text-muted'
 
 export default function RouteList({ plan, selectedRouteId, onSelect }) {
   return (
-    <div className="route-list">
-      <div className="recommendation">
-        <span className="recommendation-star">★</span>
+    <div className="flex flex-col gap-2.5">
+      <div className="flex gap-2.5 rounded-[10px] bg-good-soft px-3 py-2.5">
+        <span className="text-lg leading-[1.1] text-star">★</span>
         <div>
           <strong>Recommended: Route {plan.recommendedRouteId}</strong>
-          <p>{plan.recommendationReason}</p>
+          <p className="text-[13px] text-muted">{plan.recommendationReason}</p>
         </div>
       </div>
 
-      {plan.routes.map((r) => (
-        <button
-          key={r.id}
-          type="button"
-          className={`route-card${r.id === selectedRouteId ? ' is-selected' : ''}`}
-          style={{ '--route-color': routeColor(r.id) }}
-          onClick={() => onSelect(r.id)}
-        >
-          <div className="route-card-head">
-            <span className="route-badge">{r.id}</span>
-            <span className="route-card-name">{r.name}</span>
-            {r.id === plan.recommendedRouteId && <span className="tag tag-rec">Recommended</span>}
-            {r.id === plan.fastestRouteId && <span className="tag">Fastest</span>}
-            {r.id === plan.safestRouteId && <span className="tag">Safest</span>}
-          </div>
-
-          <div className="route-card-stats">
-            <div>
-              <span>Drive time</span>
-              <strong>{formatDuration(r.durationMinutes)}</strong>
-            </div>
-            <div>
-              <span>Distance</span>
-              <strong>{formatMiles(r.distanceMiles)}</strong>
-            </div>
-            <div>
-              <span>Arrive</span>
-              <strong>{formatTime(r.arrival)}</strong>
-            </div>
-          </div>
-
-          <div className="risk-meter">
-            <div className="risk-meter-label">
-              <span>Worst weather on route</span>
-              <strong style={{ color: RISK_COLOR[r.riskLevel] }}>{riskLabel(r.riskLevel)}</strong>
-            </div>
-            {/* Share of the route's miles at each risk level */}
-            <div className="risk-meter-track" title="Miles at each risk level">
-              {RISK_LEVELS.map((l) =>
-                r.milesByLevel[l.key] ? (
-                  <div
-                    key={l.key}
-                    style={{ width: `${(r.milesByLevel[l.key] / r.distanceMiles) * 100}%`, background: l.color }}
-                  />
-                ) : null,
-              )}
-            </div>
-            <div className="risk-meter-miles">
-              {['no_travel', 'severe', 'high'].map((level) => (
-                <span key={level} className={r.milesByLevel[level] ? 'is-flagged' : ''}>
-                  {riskLabel(level)} {r.milesByLevel[level]} mi
-                </span>
-              ))}
-              <span>Avg risk {r.riskScore}</span>
-            </div>
-          </div>
-
-          <p className="route-card-summary">{r.summary}</p>
-        </button>
+      {plan.routes.map((route) => (
+        <RouteCard
+          key={route.id}
+          route={route}
+          plan={plan}
+          selected={route.id === selectedRouteId}
+          onSelect={() => onSelect(route.id)}
+        />
       ))}
+    </div>
+  )
+}
+
+function RouteCard({ route, plan, selected, onSelect }) {
+  return (
+    <button
+      type="button"
+      className={
+        'flex cursor-pointer flex-col gap-2.5 rounded-[10px] border border-l-4 border-l-(--route-color) bg-surface p-3 text-left ' +
+        (selected ? 'border-(--route-color) shadow-[0_0_0_1px_var(--route-color)]' : 'border-line hover:border-(--route-color)')
+      }
+      style={{ '--route-color': routeColor(route.id) }}
+      onClick={onSelect}
+    >
+      <div className="flex flex-wrap items-center gap-1.5">
+        <span className="grid size-[22px] place-items-center rounded-md bg-(--route-color) text-xs font-bold text-white">
+          {route.id}
+        </span>
+        <span className="mr-auto font-semibold">{route.name}</span>
+        {route.id === plan.recommendedRouteId && <span className={`${TAG} bg-good-soft text-good`}>Recommended</span>}
+        {route.id === plan.fastestRouteId && <span className={`${TAG} bg-subtle text-muted`}>Fastest</span>}
+        {route.id === plan.safestRouteId && <span className={`${TAG} bg-subtle text-muted`}>Safest</span>}
+      </div>
+
+      <div className="grid grid-cols-3 gap-1.5 tabular-nums">
+        <Stat label="Drive time" value={formatDuration(route.durationMinutes)} />
+        <Stat label="Distance" value={formatMiles(route.distanceMiles)} />
+        <Stat label="Arrive" value={formatTime(route.arrival)} />
+      </div>
+
+      <RiskMeter route={route} />
+
+      <p className="text-[13px] text-muted">{route.summary}</p>
+    </button>
+  )
+}
+
+function Stat({ label, value }) {
+  return (
+    <div>
+      <span className={STAT_LABEL}>{label}</span>
+      <strong>{value}</strong>
+    </div>
+  )
+}
+
+/** Worst level on the route, a bar of the miles at each level, and the miles that decide the recommendation. */
+function RiskMeter({ route }) {
+  const miles = route.milesByLevel
+  return (
+    <div>
+      <div className="mb-1 flex items-baseline justify-between">
+        <span className={STAT_LABEL}>Worst weather on route</span>
+        <strong style={{ color: riskColor(route.riskLevel) }}>{riskLabel(route.riskLevel)}</strong>
+      </div>
+
+      <div className="flex h-1.5 overflow-hidden rounded-full bg-subtle" title="Miles at each risk level">
+        {RISK_LEVELS.filter((level) => miles[level.key]).map((level) => (
+          <div
+            key={level.key}
+            className="h-full"
+            style={{ width: `${(miles[level.key] / route.distanceMiles) * 100}%`, background: level.color }}
+          />
+        ))}
+      </div>
+
+      <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-muted tabular-nums">
+        {RECOMMENDATION_LEVELS.map((level) => (
+          <span key={level} className={miles[level] ? 'font-semibold text-ink' : ''}>
+            {riskLabel(level)} {miles[level]} mi
+          </span>
+        ))}
+        <span>Avg risk {route.riskScore}</span>
+      </div>
     </div>
   )
 }

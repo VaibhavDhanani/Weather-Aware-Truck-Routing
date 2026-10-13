@@ -1,9 +1,10 @@
+import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
   optimizeDeps: {
     // react-map-gl loads maplibre-gl via a lazy import() that Vite only finds at
     // runtime; pre-bundle both so the dev server never serves a stale chunk.

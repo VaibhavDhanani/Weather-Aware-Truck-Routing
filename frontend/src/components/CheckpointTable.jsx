@@ -1,16 +1,17 @@
-import { formatTime } from '../lib/format'
-import { RISK_COLOR, riskLabel } from '../lib/risk'
+import { formatTime } from '../utils/formatUtils'
+import { riskColor, riskLabel } from '../utils/riskUtils'
+import RiskDot from './RiskDot'
 
 export default function CheckpointTable({ route, activeCheckpoint, onSelect }) {
   return (
-    <div className="checkpoints">
-      <h3>
-        Route {route.id} checkpoints <span>({route.checkpoints.length})</span>
+    <div>
+      <h3 className="mb-1.5 font-bold">
+        Route {route.id} checkpoints <span className="font-normal text-muted">({route.checkpoints.length})</span>
       </h3>
-      <div className="checkpoints-scroll">
-        <table>
+      <div className="max-h-80 overflow-y-auto rounded-[10px] border border-line">
+        <table className="w-full border-collapse text-xs tabular-nums">
           <thead>
-            <tr>
+            <tr className="*:sticky *:top-0 *:bg-[#f3f5f7] *:px-2 *:py-1.5 *:text-left *:font-semibold *:text-muted">
               <th>Mile</th>
               <th>ETA</th>
               <th>Weather</th>
@@ -24,7 +25,10 @@ export default function CheckpointTable({ route, activeCheckpoint, onSelect }) {
               return (
                 <tr
                   key={c.index}
-                  className={active ? 'is-active' : ''}
+                  className={
+                    'cursor-pointer *:border-t *:border-line *:px-2 *:py-[5px] *:whitespace-nowrap ' +
+                    (active ? 'bg-accent-soft' : 'hover:bg-[#f7f9fb]')
+                  }
                   onClick={() => onSelect({ routeId: route.id, index: c.index, lon: c.lon, lat: c.lat, fly: true })}
                 >
                   <td>{c.mile}</td>
@@ -37,7 +41,7 @@ export default function CheckpointTable({ route, activeCheckpoint, onSelect }) {
                   </td>
                   <td>{c.weather.windMph}</td>
                   <td>
-                    <span className="risk-dot" style={{ background: RISK_COLOR[c.risk.level] }} />
+                    <RiskDot color={riskColor(c.risk.level)} />
                     {riskLabel(c.risk.level)}
                   </td>
                 </tr>
