@@ -4,22 +4,14 @@ from rest_framework.viewsets import ViewSet
 
 
 def first_error_message(errors):
-    """Flatten DRF serializer errors into one human-readable line."""
     field, messages = next(iter(errors.items()))
     message = messages[0] if isinstance(messages, list) else messages
     return str(message) if field == 'non_field_errors' else f'{field}: {message}'
 
 
 class BaseViewSet(ViewSet):
-    """
-    - `get_validated_data()` validates the body with the serializer registered for
-      the current action in `action_to_request_serializer_class`.
-    - `exception_status_codes` maps domain exceptions to status codes.
-    - Errors always respond `{"detail": "..."}`; validation errors add `"errors"`.
-    """
-
-    action_to_request_serializer_class = {}  # {'plan': PlanTripRequestSerializer}
-    exception_status_codes = {}  # {ExceptionClass: status_code}
+    action_to_request_serializer_class = {}
+    exception_status_codes = {}
 
     def get_validated_data(self):
         serializer = self.action_to_request_serializer_class[self.action](data=self.request.data)

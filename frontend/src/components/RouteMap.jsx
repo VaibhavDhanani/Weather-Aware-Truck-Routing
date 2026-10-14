@@ -39,14 +39,12 @@ export default function RouteMap({
   const [cursor, setCursor] = useState('')
   const selectedRoute = plan?.routes.find((r) => r.id === selectedRouteId)
 
-  // Fit every route on screen when a new plan arrives.
   useEffect(() => {
     if (plan && mapRef.current) {
       mapRef.current.fitBounds(boundsOf(plan.routes.map((r) => r.geometry)), FIT_BOUNDS_OPTIONS)
     }
   }, [plan])
 
-  // Fly to a checkpoint picked in the table.
   useEffect(() => {
     if (activeCheckpoint?.fly && mapRef.current) {
       mapRef.current.flyTo({

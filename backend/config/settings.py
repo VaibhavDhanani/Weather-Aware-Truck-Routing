@@ -1,9 +1,3 @@
-"""Django settings. Values that differ per environment come from environment
-variables (locally from backend/.env.local); fixed app values live in trips/constants.py.
-
-The API is stateless: no database, sessions or auth — only external services and Redis.
-"""
-
 import os
 from pathlib import Path
 
@@ -35,11 +29,7 @@ DATABASES = {}
 USE_TZ = True
 TIME_ZONE = 'UTC'
 
-# Default port for `manage.py runserver` (see trips/management/commands/runserver.py).
 DEV_SERVER_PORT = int(os.environ.get('DEV_SERVER_PORT', '8010'))
-
-# ---------------------------------------------------------------------------
-# API
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [],
@@ -48,12 +38,8 @@ REST_FRAMEWORK = {
     'UNAUTHENTICATED_USER': None,
 }
 
-# Any localhost port (the Vite dev server) plus the deployed frontend(s).
 CORS_ALLOWED_ORIGIN_REGEXES = [r'^http://(localhost|127\.0\.0\.1):\d+$']
 CORS_ALLOWED_ORIGINS = [o for o in os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',') if o]
-
-# ---------------------------------------------------------------------------
-# Cache: Redis (plans for 60 s, forecasts for 30 min, city coordinates forever)
 
 REDIS_URL = os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/1')
 CACHES = {
@@ -64,9 +50,6 @@ CACHES = {
     }
 }
 
-# ---------------------------------------------------------------------------
-# Logging: everything at INFO and above goes to stdout, which Render shows under Logs.
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -74,9 +57,6 @@ LOGGING = {
     'handlers': {'console': {'class': 'logging.StreamHandler', 'formatter': 'simple'}},
     'root': {'handlers': ['console'], 'level': 'INFO'},
 }
-
-# ---------------------------------------------------------------------------
-# External services (all free, no API keys required)
 
 OSRM_BASE_URL = os.environ.get('OSRM_BASE_URL', 'https://router.project-osrm.org')
 NOMINATIM_BASE_URL = os.environ.get('NOMINATIM_BASE_URL', 'https://nominatim.openstreetmap.org')

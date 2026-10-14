@@ -5,16 +5,11 @@ export function routeColor(routeId) {
   return ROUTE_COLORS[routeId] ?? FALLBACK_ROUTE_COLOR
 }
 
-/** [lon, lat] where the route's chip goes on the map. */
 export function routeLabelPoint(route) {
   const cumMiles = cumulativeMiles(route.geometry)
   return pointAtMile(route.geometry, cumMiles, cumMiles.at(-1) * ROUTE_LABEL_POSITION)
 }
 
-/**
- * Where the truck is on `route` at `time`, interpolated between checkpoint ETAs.
- * Null before departure or after arrival.
- */
 export function truckPositionAt(route, time) {
   const checkpoints = route.checkpoints
   const t = time.getTime()

@@ -37,7 +37,6 @@ class PlanTripUtils:
         self.risk_utils = RiskUtils()
 
     def plan_trip(self, *, origin, destination, departure, load_weight_lbs, interval_miles):
-        """The full trip plan; identical requests within PLAN_CACHE_SECONDS reuse the cached response."""
         key = self._plan_cache_key(origin, destination, departure, load_weight_lbs, interval_miles)
         plan = cache.get(key)
         if plan is not None:
@@ -62,31 +61,26 @@ class PlanTripUtils:
             raise TripPlanningError('Origin and destination are the same place.')
         options = self.routing_utils.get_route_options(o, d)
 
-        # 1. Checkpoints along each route with the truck's ETA there.
         routes = [
             (route_id, opt, self._checkpoints(opt, departure, interval_miles))
             for route_id, opt in zip(ROUTE_IDS, options)
         ]
 
-        # 2. One forecast fetch covering every checkpoint ETA and the 48h heatmap.
         grid, cell_deg = self._heatmap_grid([opt.coords for _, opt, _ in routes])
         latest_eta = max(c['_eta'] for _, _, cps in routes for c in cps)
         needed = math.ceil((latest_eta - start).total_seconds() / 3600)
-        horizon = max(HEATMAP_HOURS, math.ceil(needed / 24) * 24)  # whole days improve cache reuse
+        horizon = max(HEATMAP_HOURS, math.ceil(needed / 24) * 24)
         sample_points = grid + [(c['lon'], c['lat']) for _, _, cps in routes for c in cps]
         forecast = self.weather_utils.fetch_forecast(sample_points, start, horizon)
 
-        # 3. Weather + risk per checkpoint, then per route.
         out_routes = [
             self._route_payload(route_id, opt, checkpoints, forecast, departure, load_weight_lbs)
             for route_id, opt, checkpoints in routes
         ]
 
-        # 4. Recommend per the rules: fewest No Travel / Severe / High miles, then
-        #    lowest average risk, then shortest travel time.
         ranked = sorted(out_routes, key=self.risk_utils.recommendation_key)
         fastest = min(out_routes, key=lambda r: r['durationMinutes'])
-        safest = min(out_routes, key=lambda r: self.risk_utils.recommendation_key(r)[:-1])  # ignoring time
+        safest = min(out_routes, key=lambda r: self.risk_utils.recommendation_key(r)[:-1])
         for r in out_routes:
             r['summary'] = self._summary(r, fastest=r is fastest, safest=r is safest)
 
@@ -149,7 +143,7 @@ class PlanTripUtils:
             'durationMinutes': round(opt.duration_hours * 60),
             'departure': self._iso(departure),
             'arrival': checkpoints[-1]['eta'],
-            **self.risk_utils.route_risk(checkpoints),  # riskLevel, riskScore, milesByLevel
+            **self.risk_utils.route_risk(checkpoints),
             'checkpoints': checkpoints,
         }
 
@@ -157,7 +151,7 @@ class PlanTripUtils:
         (west, south), (east, north) = self.geo_utils.bounds(lines)
         west, south = west - HEATMAP_PAD_DEG, south - HEATMAP_PAD_DEG
         east, north = east + HEATMAP_PAD_DEG, north + HEATMAP_PAD_DEG
-        # Web Mercator stretches latitude; use shorter latitude steps so cells look square on the map.
+        # Web Mercator stretches latitude; shorter latitude steps keep cells square on the map.
         lat_scale = math.cos(math.radians((north + south) / 2))
         step = max(east - west, (north - south) / lat_scale) / (HEATMAP_CELLS - 1)
         lat_step = step * lat_scale
@@ -201,7 +195,6 @@ class PlanTripUtils:
         return ' '.join(parts)
 
     def _recommendation_reason(self, ranked):
-        """Name the first rule (in priority order) that puts the winner ahead of the runner-up."""
         rec = ranked[0]
         warning = (
             'Every route crosses No Travel conditions — consider another departure time. '

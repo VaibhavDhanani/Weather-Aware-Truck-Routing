@@ -1,5 +1,3 @@
-"""Route options via OSRM (public demo server by default, no key needed)."""
-
 from dataclasses import dataclass
 
 from django.conf import settings
@@ -28,9 +26,9 @@ from trips.utils.http_utils import HttpUtils
 @dataclass
 class RouteOption:
     name: str
-    coords: list  # [(lon, lat), ...]
-    cum_miles: list  # running distance at each vertex
-    cum_hours: list  # running truck drive time at each vertex
+    coords: list
+    cum_miles: list
+    cum_hours: list
 
     @property
     def distance_miles(self):
@@ -47,7 +45,6 @@ class RoutingUtils:
         self.http_utils = HttpUtils()
 
     def get_route_options(self, origin, destination):
-        """Up to three distinct truck route options between two Places, fastest first."""
         o, d = (origin.lon, origin.lat), (destination.lon, destination.lat)
         options = [self._parse(r) for r in self._fetch([o, d], alternatives=True)]
         if not options:
@@ -79,7 +76,7 @@ class RoutingUtils:
                 'alternatives': str(MAX_ROUTES) if alternatives else 'false',
                 'overview': 'full',
                 'geometries': 'geojson',
-                'steps': 'true',  # needed for road names
+                'steps': 'true',
                 'annotations': 'distance,duration',
             },
             service=ROUTING_SERVICE,
@@ -107,7 +104,6 @@ class RoutingUtils:
             for b in boundaries[:-1]:
                 coords, seg_miles, seg_hours = self._remove_via_spike(coords, seg_miles, seg_hours, b)
         else:
-            # Annotations missing or misaligned: spread the total time by distance.
             seg_miles = [self.geo_utils.haversine_miles(a, b) for a, b in zip(coords, coords[1:])]
             total = sum(seg_miles) or 1
             hours = max(route['duration'] / 3600, total / TRUCK_MAX_MPH)
@@ -121,10 +117,6 @@ class RoutingUtils:
         )
 
     def _route_name(self, legs):
-        """'via I 70, I 76': the roads carrying the most distance, in driving order.
-
-        Prefers highway refs ("I 70") over names ("Dwight D. Eisenhower Highway").
-        """
         miles, first_seen = {}, {}
         for leg in legs:
             for step in leg.get('steps') or []:
@@ -132,7 +124,7 @@ class RoutingUtils:
                 if road:
                     miles[road] = miles.get(road, 0) + step.get('distance', 0)
                     first_seen.setdefault(road, len(first_seen))
-        if not miles:  # no steps: fall back to OSRM's own leg summaries
+        if not miles:
             for leg in legs:
                 for road in (leg.get('summary') or '').split(', '):
                     if road:
@@ -141,13 +133,13 @@ class RoutingUtils:
         top = sorted(miles, key=miles.get, reverse=True)[:3]
         return f"via {', '.join(sorted(top, key=first_seen.get))}" if top else ''
 
+    # Cut the out-and-back a via point causes when it snaps onto a dead-end road.
     def _remove_via_spike(self, coords, seg_miles, seg_hours, boundary):
-        """Cut the out-and-back a via point causes when it snaps onto a dead-end road."""
         i, j = boundary - 1, boundary + 1
         while i >= 0 and j < len(coords) and self.geo_utils.haversine_miles(coords[i], coords[j]) < VIA_SPIKE_MATCH_MILES:
             i -= 1
             j += 1
-        i, j = i + 1, j - 1  # last matching pair
+        i, j = i + 1, j - 1
         if j - i <= 2:
             return coords, seg_miles, seg_hours
         gap = self.geo_utils.haversine_miles(coords[i], coords[j])
@@ -158,14 +150,12 @@ class RoutingUtils:
         )
 
     def _overlap(self, candidate, existing):
-        """Share of `candidate`'s length that runs close to `existing`."""
         probe = self.geo_utils.sample_every(candidate.coords, OVERLAP_PROBE_STEP_MILES)
         ref = self.geo_utils.sample_every(existing.coords, OVERLAP_REFERENCE_STEP_MILES)
         near = sum(1 for p in probe if any(self.geo_utils.haversine_miles(p, q) < OVERLAP_NEAR_MILES for q in ref))
         return near / len(probe)
 
     def _detour_points(self, origin, destination):
-        """Candidate via points to either side of the straight line, mid-trip first."""
         straight = self.geo_utils.haversine_miles(origin, destination)
         heading = self.geo_utils.bearing(origin, destination)
         offset = min(DETOUR_MAX_OFFSET_MILES, max(DETOUR_MIN_OFFSET_MILES, straight * DETOUR_OFFSET_SHARE))

@@ -1,5 +1,3 @@
-"""City name -> coordinates via OpenStreetMap Nominatim (free, no key)."""
-
 import hashlib
 import logging
 import threading
@@ -33,7 +31,6 @@ class GeocodingUtils:
         self.http_utils = HttpUtils()
 
     def geocode_city(self, city):
-        """Resolve a city name ("Denver, CO") to a Place; results are cached in Redis."""
         city = city.strip()
         key = 'geocode:' + hashlib.sha1(city.lower().encode()).hexdigest()
         cached = cache.get(key)
@@ -52,7 +49,6 @@ class GeocodingUtils:
         return place
 
     def _search_city(self, city):
-        """Nominatim search limited to cities, spaced to its one-request-per-second policy."""
         cls = type(self)
         with cls._throttle_lock:
             wait = NOMINATIM_MIN_INTERVAL_SECONDS - (time.monotonic() - cls._last_request_at)

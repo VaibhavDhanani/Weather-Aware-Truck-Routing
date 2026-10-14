@@ -73,7 +73,6 @@ function Stat({ label, value }) {
   )
 }
 
-/** Worst level on the route, a bar of the miles at each level, and the miles that decide the recommendation. */
 function RiskMeter({ route }) {
   const miles = route.milesByLevel
   return (

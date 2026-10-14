@@ -2,7 +2,6 @@ import { PLAN_TRIP_URL } from '../constants'
 
 const BACKEND_DOWN = 'Could not reach the trip-planning server'
 
-
 export async function planTrip(params) {
   let response
   try {

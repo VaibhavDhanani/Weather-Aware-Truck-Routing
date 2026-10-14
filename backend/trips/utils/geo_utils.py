@@ -4,27 +4,19 @@ from trips.constants import EARTH_RADIUS_MI
 
 
 class GeoUtils:
-    """Distance and polyline helpers. Points are (lon, lat) tuples."""
-
     def haversine_miles(self, a, b):
-        """Great-circle distance in miles between two points."""
         lon1, lat1 = map(math.radians, a)
         lon2, lat2 = map(math.radians, b)
         h = math.sin((lat2 - lat1) / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin((lon2 - lon1) / 2) ** 2
         return 2 * EARTH_RADIUS_MI * math.asin(math.sqrt(min(1.0, h)))
 
     def cumulative(self, values):
-        """Running totals, starting at 0: [a, b] -> [0, a, a + b]."""
         out = [0.0]
         for v in values:
             out.append(out[-1] + v)
         return out
 
     def interpolate(self, cum, values, x):
-        """Value at position `x`, where `values[i]` sits at running position `cum[i]`.
-
-        `values` may hold numbers or (lon, lat) tuples.
-        """
         if x <= cum[0]:
             return values[0]
         if x >= cum[-1]:
@@ -44,13 +36,11 @@ class GeoUtils:
         return a + (b - a) * f
 
     def bounds(self, lines):
-        """((min_lon, min_lat), (max_lon, max_lat)) covering every polyline."""
         lons = [p[0] for line in lines for p in line]
         lats = [p[1] for line in lines for p in line]
         return (min(lons), min(lats)), (max(lons), max(lats))
 
     def bearing(self, a, b):
-        """Initial compass bearing in degrees from point a to point b."""
         lon1, lat1 = map(math.radians, a)
         lon2, lat2 = map(math.radians, b)
         x = math.sin(lon2 - lon1) * math.cos(lat2)
@@ -58,7 +48,6 @@ class GeoUtils:
         return math.degrees(math.atan2(x, y)) % 360
 
     def offset_point(self, origin, bearing_deg, distance_miles):
-        """Point `distance_miles` from `origin` along `bearing_deg`."""
         lon, lat = map(math.radians, origin)
         d = distance_miles / EARTH_RADIUS_MI
         brg = math.radians(bearing_deg)
@@ -69,7 +58,6 @@ class GeoUtils:
         return math.degrees(lon2), math.degrees(lat2)
 
     def sample_every(self, coords, step_miles):
-        """Vertices roughly every `step_miles` along a polyline, always keeping both ends."""
         if not coords:
             return []
         out = [coords[0]]

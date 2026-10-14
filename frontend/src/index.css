@@ -19,7 +19,6 @@
 
   --shadow-float: 0 4px 16px rgba(15, 23, 42, 0.12);
 
-  /* Below this width the map goes on top and the panel below it. */
   --breakpoint-desk: 860px;
 }
 

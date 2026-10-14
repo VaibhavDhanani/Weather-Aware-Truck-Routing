@@ -108,7 +108,6 @@ function CityInput({ label, value, onChange }) {
 
   function handleChange(e) {
     const next = e.target.value
-    // Native validity blocks form submission while the value isn't a city name.
     e.target.setCustomValidity(next.trim() === '' || isCityName(next) ? '' : CITY_NAME_ERROR)
     onChange(next)
   }

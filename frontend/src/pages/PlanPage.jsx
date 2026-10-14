@@ -31,7 +31,6 @@ export default function PlanPage() {
       setPlan(result)
       setSelectedRouteId(result.recommendedRouteId)
       setActiveCheckpoint(null)
-      // Start the slider at departure so the truck marker is on the map.
       const departureHour = Math.round((Date.parse(result.departure) - Date.parse(result.heatmap.forecastStart)) / HOUR_MS)
       setHour(Math.min(result.heatmap.hours, Math.max(0, departureHour)))
     } catch (err) {

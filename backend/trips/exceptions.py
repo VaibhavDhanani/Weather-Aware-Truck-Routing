@@ -1,5 +1,5 @@
 class ExternalServiceError(Exception):
-    """An upstream API (geocoding, routing or weather) failed or returned junk."""
+    pass
 
 
 class LocationNotFound(Exception):

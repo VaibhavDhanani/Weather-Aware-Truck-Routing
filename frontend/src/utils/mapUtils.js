@@ -1,5 +1,3 @@
-// MapLibre layer styles and the GeoJSON the map's sources draw from.
-
 import {
   HEATMAP_COLOR_STOPS,
   HEATMAP_INTENSITY,
@@ -11,8 +9,6 @@ import {
 import { routeColor } from './routeUtils'
 
 const isSelected = ['get', 'selected']
-
-// ------------------------------------------------------------------ layers
 
 export const ROUTE_CASING_LAYER = {
   id: 'route-casing',
@@ -43,9 +39,8 @@ export const CHECKPOINT_LAYER = {
   },
 }
 
-/** Heatmap whose kernel stays ~HEATMAP_KERNEL_CELLS grid cells wide at every zoom. */
 export function heatmapLayer(cellSizeDeg, visible) {
-  const radiusAtZoom0 = cellSizeDeg * (512 / 360) * HEATMAP_KERNEL_CELLS // 512 px per 360° at zoom 0
+  const radiusAtZoom0 = cellSizeDeg * (512 / 360) * HEATMAP_KERNEL_CELLS
   return {
     id: 'weather-heat',
     type: 'heatmap',
@@ -60,8 +55,6 @@ export function heatmapLayer(cellSizeDeg, visible) {
     },
   }
 }
-
-// ----------------------------------------------------------------- geojson
 
 const featureCollection = (features) => ({ type: 'FeatureCollection', features })
 const point = (lon, lat, properties) => ({ type: 'Feature', geometry: { type: 'Point', coordinates: [lon, lat] }, properties })
@@ -80,7 +73,6 @@ export function checkpointsGeoJson(route) {
   return featureCollection(route.checkpoints.map((c) => point(c.lon, c.lat, { index: c.index, level: c.risk.level })))
 }
 
-/** Heatmap cells for one forecast hour; near-calm cells get no weight. */
 export function heatmapGeoJson(heatmap, hour) {
   return featureCollection(
     heatmap.points.map((p) => {

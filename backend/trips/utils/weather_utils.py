@@ -1,5 +1,3 @@
-"""Hourly forecasts from Open-Meteo (free, no key) and conversion to the app's weather shape."""
-
 import logging
 from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
@@ -26,6 +24,7 @@ from trips.constants import (
     WEATHER_CACHE_VERSION,
     WEATHER_GRID_DEG,
     WEATHER_MAX_PARALLEL,
+    WEATHER_MIN_FETCH_HOURS,
     WEATHER_SERVICE,
     WMO_CONDITIONS,
 )
@@ -36,24 +35,20 @@ logger = logging.getLogger(__name__)
 
 
 class Forecast:
-    """Hourly forecasts for a set of grid cells, starting at `start` (UTC, on the hour)."""
-
     def __init__(self, start, hours, series, weather_utils):
         self.start = start
         self.hours = hours
-        self._series = series  # grid key -> {var: [values per hour]}
+        self._series = series
         self.weather_utils = weather_utils
 
     def covers(self, when):
         return 0 <= round((when - self.start).total_seconds() / 3600) <= self.hours
 
     def at(self, lon, lat, when):
-        """Weather at a point for the forecast hour nearest `when` (clamped to the window)."""
         idx = round((when - self.start).total_seconds() / 3600)
         return self.at_hour(lon, lat, min(max(idx, 0), self.hours))
 
     def at_hour(self, lon, lat, idx):
-        """Weather at a point `idx` hours after `start`."""
         series = self._series.get(self.weather_utils.grid_key(lon, lat))
         if series is None:
             raise ExternalServiceError(f'No forecast was fetched for ({lon:.3f}, {lat:.3f}).')
@@ -65,23 +60,21 @@ class WeatherUtils:
         self.http_utils = HttpUtils()
 
     def grid_key(self, lon, lat):
-        """Snap a point to the weather grid so nearby samples share one forecast."""
         return (
             round(round(lon / WEATHER_GRID_DEG) * WEATHER_GRID_DEG, 4),
             round(round(lat / WEATHER_GRID_DEG) * WEATHER_GRID_DEG, 4),
         )
 
     def fetch_forecast(self, points, start, hours):
-        """Forecast for every (lon, lat) in `points` covering `start` .. `start + hours`."""
-        hours = min(hours, MAX_FORECAST_HOURS)
+        hours = min(max(hours, WEATHER_MIN_FETCH_HOURS), MAX_FORECAST_HOURS)
         stamp = start.strftime('%Y%m%d%H')
         cache_key = {
-            key: f'{WEATHER_CACHE_VERSION}:{stamp}:{hours}:{key[0]}:{key[1]}'
+            key: f'{WEATHER_CACHE_VERSION}:{stamp}:{key[0]}:{key[1]}'
             for key in sorted({self.grid_key(lon, lat) for lon, lat in points})
         }
 
         cached = cache.get_many(cache_key.values())
-        series = {key: cached[ck] for key, ck in cache_key.items() if ck in cached}
+        series = {key: cached[ck] for key, ck in cache_key.items() if ck in cached and self._has_hours(cached[ck], hours)}
         missing = [key for key in cache_key if key not in series]
         logger.info('Redis weather cache: %d of %d grid cells cached, fetching %d', len(series), len(cache_key), len(missing))
 
@@ -119,13 +112,15 @@ class WeatherUtils:
         for key, loc in zip(keys, locations):
             hourly = loc.get('hourly') or {}
             series = {var: hourly.get(var) or [] for var in HOURLY_VARS}
-            if any(len(v) < hours + 1 for v in series.values()):
+            if not self._has_hours(series, hours):
                 raise ExternalServiceError(f'{WEATHER_SERVICE} returned an incomplete forecast.')
             out[key] = series
         return out
 
+    def _has_hours(self, series, hours):
+        return all(len(values) > hours for values in series.values())
+
     def to_weather(self, hour):
-        """Map one hour of Open-Meteo values to the API's weather object."""
         code = int(hour.get('weather_code') or 0)
         temp_f = round(hour.get('temperature_2m') or 0)
         precip = round(hour.get('precipitation') or 0, 2)

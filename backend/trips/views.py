@@ -19,11 +19,9 @@ class TripViewSet(BaseViewSet):
 
     @action(detail=False, methods=['post'])
     def plan(self, request):
-        """POST /api/trips/plan/ — three weather-scored route options for a truck trip."""
         return Response(PlanTripUtils().plan_trip(**self.get_validated_data()))
 
 
 class HealthViewSet(BaseViewSet):
     def list(self, request):
-        """GET /api/health/ — liveness check."""
         return Response({'status': 'ok'})
